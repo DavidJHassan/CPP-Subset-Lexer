@@ -3,8 +3,7 @@ import java.io.*;
 
 public class Lexer
 {
-
-	public static void main(String args[]) throws IOException, FileNotFoundException
+	public static ArrayList initializeVariables()
 	{
 		/*Variables Setup*/
 		State Initial = new State("initial");
@@ -15,6 +14,15 @@ public class Lexer
 		State String = new State("string");
 		State Final = new State("final");
 		
+		ArrayList<State> states = new ArrayList<State>();
+		states.add(Initial);
+		states.add(Integer);
+		states.add(Float);
+		states.add(Operand);
+		states.add(Identifier);
+		states.add(String);
+		states.add(Final);
+		
 		Condition Alpha = new Condition("alpha");//a-zA-Z
 		Condition Digit = new Condition("digit");//0-9
 		Condition White = new Condition("white");//whitespace characters
@@ -23,7 +31,19 @@ public class Lexer
 		Condition Paren = new Condition("paren"); // (, )
 		Condition Semicolon = new Condition("Semicolon");// ;
 		Condition Decimal = new Condition("decimal");// .
+		Condition All = new Condition("all");// all are excepted except the / which is handles in StateMachine as special case
 		Condition eof = new Condition("eof");// EOF
+		
+		ArrayList<Condition> conditions = new ArrayList<Condition>();
+		conditions.add(Alpha);
+		conditions.add(Digit);
+		conditions.add(White);
+		conditions.add(Op);
+		conditions.add(Paren);
+		conditions.add(Semicolon);
+		conditions.add(Decimal);
+		conditions.add(All);
+		conditions.add(eof);
 		
 		
 		ArrayList<Condition> initialRelated = new ArrayList<Condition>();
@@ -46,14 +66,7 @@ public class Lexer
 		identifierRelated.add(Digit);
 		identifierRelated.add(Alpha);
 		toIdentifierRelated.add(Alpha);
-		stringRelated.add(Alpha);
-		stringRelated.add(Digit);
-		stringRelated.add(White);
-		stringRelated.add(Quote);
-		stringRelated.add(Op);
-		stringRelated.add(Paren);
-		stringRelated.add(Decimal);
-		stringRelated.add(Semicolon);
+		stringRelated.add(All);
 		toStringRelated.add(Quote);
 
 		ArrayList<Transition> transitions = new ArrayList<Transition>();
@@ -79,7 +92,7 @@ public class Lexer
 		
 		Transition FromOperandtoInitial = new Transition(Operand, initialRelated, Initial);
 		Transition FromOperandtoInteger = new Transition(Operand, integerRelated, Integer);
-		Transition FromOperandtoOperand = new Transition(Operand, operandRelated, Operand);
+		//Transition FromOperandtoOperand = new Transition(Operand, operandRelated, Operand);
 		Transition FromOperandtoIdentifier = new Transition(Operand, toIdentifierRelated, Identifier);
 		Transition FromOperandtoString = new Transition(Operand, toStringRelated, String);
 		
@@ -112,7 +125,7 @@ public class Lexer
 		
 		transitions.add(FromOperandtoInitial);
 		transitions.add(FromOperandtoInteger);
-		transitions.add(FromOperandtoOperand);
+		//transitions.add(FromOperandtoOperand);
 		transitions.add(FromOperandtoIdentifier);
 		transitions.add(FromOperandtoString);
 		
@@ -125,18 +138,77 @@ public class Lexer
 		transitions.add(FromStringtoString);
 		/*End Variables*/
 		
+		ArrayList returnArgs = new ArrayList();
+		returnArgs.add(states);
+		returnArgs.add(conditions);
+		returnArgs.add(transitions);
+		
+		return returnArgs;
+		
+	}
+	
+	
+	
+	
+	
+	public static StateMachine checkCondition(StateMachine SM, ArrayList<Condition> conditions, String [] regex, State currentState, String currentChar)
+	{
+		if(currentState.state == "string" && !currentChar.matches(regex[3]))//Special case for when in the string state
+		{
+			SM.apply(conditions.get(7));
+		}
+		else if(currentChar.matches(regex[3]))//If character is a quotation mark we have entered or left a string
+		{
+			SM.apply(conditions.get(3));
+		}
+		else if(currentChar.matches(regex[0]))//Could be an identifier or in a string
+		{
+			SM.apply(conditions.get(0));
+		}				
+		else if(currentChar.matches(regex[1]))//could be entering into a integer/ float or in a string
+		{
+			SM.apply(conditions.get(1));
+		}
+		else if(currentChar.matches(regex[2]))//Should return back to initial state unless in string state
+		{
+			SM.apply(conditions.get(2));
+		}
+		
+		else if(currentChar.matches(regex[4]))
+		{
+			SM.apply(conditions.get(4));
+		}
+		else
+		{
+			System.out.println("Unrecognized symbol: "+currentChar);
+		}
+		
+		return SM;
+		
+	}
+
+
+	public static void main(String args[]) throws IOException, FileNotFoundException
+	{
+		
+		ArrayList objects = initializeVariables();
+		ArrayList<State> states = (ArrayList<State>)objects.get(0);
+		ArrayList<Condition> conditions = (ArrayList<Condition>)objects.get(1);
+		ArrayList<Transition> transitions = (ArrayList<Transition>)objects.get(2);
 		
 		
 		
 		String ALPHA = "[A-Za-z]";
 		String DIGIT = "[0-9]";
 		String WHITE = "[\n\\ \t\b\012]";
+		String QUOTE = "\"";
+		String PAREN = "[()]";
 		
-		StateMachine SM = new StateMachine(Initial, transitions);
+		String [] regex = {ALPHA, DIGIT, WHITE, QUOTE, PAREN};
 		
+		StateMachine SM = new StateMachine(states.get(0), transitions);//Initial, transitions;
 		BufferedReader in = null;
 		in = new BufferedReader(new FileReader(args[0]));
-		
 		String currentLine = null;
 		
 		while((currentLine = in.readLine()) != null)
@@ -145,63 +217,44 @@ public class Lexer
 			String tokenType = "";
 			int tokenLength = 0;		
 			char [] chars = currentLine.toCharArray();
-			State current = SM.current;
 			
 			for(int i = 0; i<chars.length; i++)
 			{
 				String currentChar = ""+chars[i];
-				//System.out.println(currentChar);
 				
-				if(currentChar.matches(ALPHA))//Could be an identifier or in a string
-				{
-					if(SM.current.state == "initial")
-					{
-						System.out.println(SM.current.state);
-						SM.apply(toIdentifierRelated);
-						System.out.println(SM.current.state);
-					}
-					else if(SM.current.state == "identifier")
-					{
-						SM.apply(identifierRelated);
-					}
-					else if(SM.current.state == "string")
-					{
-						SM.apply(stringRelated);
-					}
-				}
+				SM = checkCondition(SM, conditions, regex,  SM.current, currentChar);
+				State current = SM.current;
 				
-				if(currentChar.matches(WHITE))
-				{
-					if(SM.current.state != "string")
-					{
-						System.out.println(SM.current.state);
-						SM.apply(initialRelated);
-						System.out.println(SM.current.state);
-					}
-				}
+				StateMachine peeker = null;
 				
-		
-				if(SM.current != null)
+				if( i + 1 < chars.length)
 				{
-					if(current != SM.current && current.state != "initial")
+					peeker = new StateMachine(SM.current, transitions);
+					peeker = checkCondition(peeker,conditions, regex, SM.current, ""+chars[i+1]);
+					if(current != peeker.current)
 					{
-						tokenType = current.state;
 						currentToken +=currentChar;
+						tokenType = current.state;
 						System.out.println("<"+tokenType+" "+currentToken+">");//found token
+						currentToken = "";
+						tokenType = "";
+					}
+					else
+					{
+						currentToken +=currentChar;
+						tokenType = current.state;
 					}
 				}
-				else
+				else//Last char on line. So that is our token found.
 				{
-					System.out.println("Error");
-					SM.current = Initial;
+					currentToken +=currentChar;
+					tokenType = current.state;
+					System.out.println("<"+tokenType+" "+currentToken+">");//found token
 				}
-				
-				
 			}
 			
 			
 		} 
-		
 		
 		
 		

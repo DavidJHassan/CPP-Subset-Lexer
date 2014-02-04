@@ -11,17 +11,27 @@ class StateMachine
         this.transitions = transitions;
     }
 
-    void apply(ArrayList<Condition> conditions) 
+    void apply(Condition condition) 
     {
-        current = getNextState(conditions);
+		current = getNextState(condition);
     }
 
-    State getNextState(ArrayList<Condition> conditions) 
+    State getNextState(Condition condition) 
     {
         for(Transition transition : transitions) 
         {
             boolean currentStateMatches = transition.from.equals(current);
-            boolean conditionsMatch = transition.conditions.equals(conditions);
+            boolean conditionsMatch = false;
+
+			for(Condition t : transition.conditions)
+			{
+				if(t.equals(condition))
+				{
+					conditionsMatch = true;
+				}
+			}
+			
+			
             if(currentStateMatches && conditionsMatch) 
             {
                 return transition.to;
