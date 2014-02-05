@@ -6,84 +6,157 @@ public class Lexer
 	public static ArrayList initializeVariables()
 	{
 		/*Variables Setup*/
-		State Initial = new State("initial");
-		State Integer = new State("integer");
+		State Initial = new State("initial",true);
+		State Integer = new State("integer",true);
+		State Equals = new State("equals",true);
+		State Plus = new State("plus",true);
+		State Times = new State("times",true);
+		State Semi = new State("semicolon",true);
+		State Identifier = new State("identifier",true);
+		State Decimal = new State("decimal",true);
+		State Lparen = new state("lparen",true);
+		State Rparen = new State("rparen",true);
+		State Quote = new State("quote",true);
 		State Float = new State("float");
-		State Operand = new State("ops");
-		State Identifier = new State("identifier");
-		State String = new State("string");
-		State Final = new State("final");
+		State String = new State)"string");
+		State PlusPlus = new State("plusplus");
+		State PlusEquals = new State("plusequals");
+		State TimesEquals = new State("timesequals");
 		
 		ArrayList<State> states = new ArrayList<State>();
 		states.add(Initial);
 		states.add(Integer);
-		states.add(Float);
-		states.add(Operand);
+		states.add(Equals);
+		states.add(Plus);
+		states.add(Times);
+		states.add(Semi);
 		states.add(Identifier);
+		states.add(Decimal);
+		states.add(Lparen);
+		states.add(Rparen);
+		states.add(Quote);
+		states.add(Float);
 		states.add(String);
-		states.add(Final);
-		
-		Condition Alpha = new Condition("alpha");//a-zA-Z
-		Condition Digit = new Condition("digit");//0-9
-		Condition White = new Condition("white");//whitespace characters
-		Condition Quote = new Condition("quote");// "
-		Condition Op = new Condition("operand");// =, +=, +, ++, *, *=
-		Condition Paren = new Condition("paren"); // (, )
-		Condition Semicolon = new Condition("Semicolon");// ;
-		Condition Decimal = new Condition("decimal");// .
-		Condition All = new Condition("all");// all are excepted except the / which is handles in StateMachine as special case
-		Condition eof = new Condition("eof");// EOF
+		states.add(PlusPlus);
+		states.add(PlusEquals);
+		states.add(TimesEquals);
+
+		Condition white = new Condition("white");//whitespace characters
+		Condition alpha = new Condition("alpha");//a-zA-Z
+		Condition digit = new Condition("digit");//0-9
+		Condition lparen = new Condition("lparen"); // (
+		Condition rparen = new Condition("lparen"); // (
+		Condition equals = new Condition("equals");// =
+		Condition plus = new Condition("plus");// +
+		Condition times = new Condition("times");// *
+		Condition semi = new Condition("semi");// ;
+		Condition quote = new Condition("quote");// "
+		Condition decimal = new Condition("decimal");// .
+		Condition all = new Condition("all");// all are excepted except the / which is handles in StateMachine as special case
+
 		
 		ArrayList<Condition> conditions = new ArrayList<Condition>();
-		conditions.add(Alpha);
-		conditions.add(Digit);
-		conditions.add(White);
-		conditions.add(Quote);
-		conditions.add(Op);
-		conditions.add(Paren);
-		conditions.add(Semicolon);
-		conditions.add(Decimal);
-		conditions.add(All);
-		conditions.add(eof);
-		
+		conditions.add(white);
+		conditions.add(alpha);
+		conditions.add(digit);
+		conditions.add(lparen);
+		conditions.add(rparens);
+		conditions.add(equals);
+		conditions.add(plus);
+		conditions.add(times);
+		conditions.add(semi);
+		conditions.add(quote);
+		conditions.add(decimal);
+		conditions.add(all);
 		
 		ArrayList<Condition> initialRelated = new ArrayList<Condition>();
 		ArrayList<Condition> integerRelated = new ArrayList<Condition>();
-		ArrayList<Condition> floatRelated = new ArrayList<Condition>();
-		ArrayList<Condition> toFloatRelated = new ArrayList<Condition>();
-		ArrayList<Condition> operandRelated = new ArrayList<Condition>();
-		ArrayList<Condition> stringRelated = new ArrayList<Condition>();
-		ArrayList<Condition> toStringRelated = new ArrayList<Condition>();
-		ArrayList<Condition> identifierRelated = new ArrayList<Condition>();
+		ArrayList<Condition> equalsRelated = new ArrayList<Condition>();
+		ArrayList<Condition> plusRelated = new ArrayList<Condition>();
+		ArrayList<Condition> timesRelated = new ArrayList<Condition>();
+		ArrayList<Condition> semiRelated = new ArrayList<Condition>();
 		ArrayList<Condition> toIdentifierRelated = new ArrayList<Condition>();
+		ArrayList<Condition> identifierRelated = new ArrayList<Condition>();
+		ArrayList<Condition> decimalRelated = new ArrayList<Condition>();
+		ArrayList<Condition> lparenRelated = new ArrayList<Condition>();
+		ArrayList<Condition> rparenRelated = new ArrayList<Condition>();
+		ArrayList<Condition> quoteRelated = new ArrayList<Condition>();
+		ArrayList<Condition> toFloatRelated = new ArrayList<Condition>();
+		ArrayList<Condition> floatRelated = new ArrayList<Condition>();
+		ArrayList<Condition> stringRelated = new ArrayList<Condition>();
+		ArrayList<Condition> plusplusRelated= new ArrayList<Condition>();
+		ArrayList<Condition> plusequalsRelated= new ArrayList<Condition>();
+		ArrayList<Condition> timesequalsRelated= new ArrayList<Condition>();
 		
-		initialRelated.add(White);
-		initialRelated.add(Semicolon);
-		initialRelated.add(Paren);
-		integerRelated.add(Digit);
-		floatRelated.add(Digit);
-		toFloatRelated.add(Decimal);
-		operandRelated.add(Op);
-		identifierRelated.add(Digit);
-		identifierRelated.add(Alpha);
-		toIdentifierRelated.add(Alpha);
-		stringRelated.add(All);
-		toStringRelated.add(Quote);
-
-		ArrayList<Transition> transitions = new ArrayList<Transition>();
-		
+		initialRelated.add(white);
+		integerRelated.add(digit);
+		equalsRelated.add(equals);
+		plusRelated.add(plus);
+		timesRelated.add(times);
+		semiRelated.add(semi);
+		toIdentifierRelated.add(alpha);
+		identifierRelated.add(digit);
+		identifierRelated.add(alpha);
+		decimalRelated.add(decimal);
+		lparenRelated.add(lparen);
+		rparenRelated.add(rparen);
+		quoteRelated.add(quote);
+		toFloatRelated.add(decimal);
+		floatRelated.add(digit);
+	    stringRelated.add(all);
+	    plusplusRelated.add(plusplus);
+	    plusequals.add(plusequals);
+	    timesequals.add(timesequals);
+	    
 		Transition FromInitialtoInitial = new Transition(Initial, initialRelated, Initial);
 		Transition FromInitialtoInteger = new Transition(Initial, integerRelated, Integer);
-		Transition FromInitialtoOperand = new Transition(Initial, operandRelated, Operand);
+		Transition FromInitialtoEquals = new Transition(Initial, equalsRelated, Equals);
+		Transition FromInitialtoPlus = new Transition(Initial, plusRelated, Plus);
+		Transition FromInitialtoTimes = new Transition(Initial, timesRelated, Times);
+		Transition FromInitialtoSemi = new Transition(Initial, semiRelated, Semi);
 		Transition FromInitialtoIdentifier = new Transition(Initial, toIdentifierRelated, Identifier);
-		Transition FromInitialtoString = new Transition(Initial, toStringRelated, String);
+		Transition FromInitialtoDecimal = new Transition(Initial, decimalRelated, Decimal);
+		Transition FromInitialtoLparen = new Transition(Initial, lparenRelated, Lparen);
+		Transition FromInitialtoRparen = new Transition(Initial, rparenRelated, Rparen);
+		Transition FromInitialtoQuote = new Transition(Initial, quoteRelated, Quote);
 		
 		Transition FromIntegertoInitial = new Transition(Integer, initialRelated, Initial);
 		Transition FromIntegertoInteger = new Transition(Integer, integerRelated, Integer);
-		Transition FromIntegertoFloat = new Transition(Integer, toFloatRelated, Float);
-		Transition FromIntegertoOperand = new Transition(Integer, operandRelated, Operand);
+		Transition FromIntegertoEquals = new Transition(Integer, equalsRelated, Equals);
+		Transition FromIntegertoPlus = new Transition(Integer, plusRelated, Plus);
+		Transition FromIntegertoTimes = new Transition(Integer, timesRelated, Times);
+		Transition FromIntegertoSemi = new Transition(Integer, semiRelated, Semi);
 		Transition FromIntegertoIdentifier = new Transition(Integer, toIdentifierRelated, Identifier);
-		Transition FromIntegertoString = new Transition(Integer, toStringRelated, String);
+		Transition FromIntegertoLparen = new Transition(Integer, lparenRelated, Lparen);
+		Transition FromIntegertoRparen = new Transition(Integer, rparenRelated, Rparen);
+		Transition FromIntegertoQuote = new Transition(Integer,quoteRelated, Quote);
+		Transition FromIntegertoFloat = new Transition(Integer, toFloatRelated, Float);
+		
+		Transition FromEqualstoInitial = new Transition(Equals, initialRelated, Initial);
+		Transition FromEqualstoInteger = new Transition(Equals, integerRelated, Integer);
+		Transition FromEqualstoEquals = new Transition(Equals, equalsRelated, Equals);
+		Transition FromEqualstoPlus = new Transition(Equals, plusRelated, Plus);
+		Transition FromEqualstoTimes = new Transition(Equals, timesRelated, Times);
+		Transition FromEqualstoSemi = new Transition(Equals, semiRelated, Semi);
+		Transition FromEqualstoIdentifier = new Transition(Equals, identifierRelated, Identifier);
+		Transition FromEqualstoDecimal = new Transition(Equals, decimalRelated, Decimal);
+		Transition FromEqualstoLparen = new Transition(Equals, lparenRelated, Lparen);
+		Transition FromEqualstoRparen = new Transition(Equals, rparenRelated, Rparen);
+		Transition FromEqualstoQuote = new Transition(Equals, quoteRelated, Quote);
+		
+		Transition FromPlustoInitial = new Transition(Plus, initialRelated, Initial);
+		Transition FromPlustoInteger = new Transition(Plus, integerRelated, Integer);
+		Transition FromPlustoTimes = new Transition(Plus, timesRelated, Times);
+		Transition FromPlustoSemi = new Transition(Plus, semiRelated, Semi);
+		Transition FromPlustoIdentifier = new Transition(Plus, toIdentifierRelated, Identifier);
+		Transition FromPlustoDecimal = new Transition(Plus, decimalRelated, Decimal);
+		Transition FromPlustoLparen = new Transition(Plus, lparenRelated, Lparen);
+		Transition FromPlustoRparen = new Transition(Plus, rparenRelated, Rparen);
+		Transition FromPlustoQuote = new Transition(Plus, quoteRelated, Quote);
+		Transition FromPlustoPlusPlus = new Transition(Plus, plusRelated, PlusPlus);
+		Transition FromPlustoPlusEquals = new Transition(Plus, equalsRelated, PlusEquals);
+		
+		
 		
 		Transition FromFloattoInitial = new Transition(Float, initialRelated, Initial);
 		Transition FromFloattoFloat = new Transition(Float, floatRelated, Float);
@@ -105,6 +178,7 @@ public class Lexer
 		Transition FromStringtoInitial = new Transition(String, toStringRelated, Initial);
 		Transition FromStringtoString = new Transition(String, stringRelated, String);
 		
+		ArrayList<Transition> transitions = new ArrayList<Transition>();
 		transitions.add(FromInitialtoInitial);
 		transitions.add(FromInitialtoInteger);
 		transitions.add(FromInitialtoOperand);
