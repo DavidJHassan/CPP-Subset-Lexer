@@ -4,9 +4,11 @@ class StateMachine
 {
     ArrayList<Transition> transitions;
     State current;
+    String name;
 
-    StateMachine(State start, ArrayList<Transition> transitions) 
+    StateMachine(String name, State start, ArrayList<Transition> transitions) 
     {
+		this.name = name;
         this.current = start;
         this.transitions = transitions;
     }

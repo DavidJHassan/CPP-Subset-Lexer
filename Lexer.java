@@ -38,6 +38,7 @@ public class Lexer
 		conditions.add(Alpha);
 		conditions.add(Digit);
 		conditions.add(White);
+		conditions.add(Quote);
 		conditions.add(Op);
 		conditions.add(Paren);
 		conditions.add(Semicolon);
@@ -102,7 +103,7 @@ public class Lexer
 		Transition FromIdentifiertoString = new Transition(Identifier, toStringRelated, String);
 		
 		Transition FromStringtoInitial = new Transition(String, toStringRelated, Initial);
-		Transition FromStringtoString = new Transition(String, stringRelated, Initial);
+		Transition FromStringtoString = new Transition(String, stringRelated, String);
 		
 		transitions.add(FromInitialtoInitial);
 		transitions.add(FromInitialtoInteger);
@@ -154,12 +155,12 @@ public class Lexer
 	public static StateMachine checkCondition(StateMachine SM, ArrayList<Condition> conditions, String [] regex, State currentState, String currentChar)
 	{
 		if(currentState.state == "string" && !currentChar.matches(regex[3]))//Special case for when in the string state
-		{
-			SM.apply(conditions.get(7));
+		{	
+			SM.apply(conditions.get(8));
 		}
 		else if(currentChar.matches(regex[3]))//If character is a quotation mark we have entered or left a string
-		{
-			SM.apply(conditions.get(3));
+		{	
+				SM.apply(conditions.get(3));
 		}
 		else if(currentChar.matches(regex[0]))//Could be an identifier or in a string
 		{
@@ -177,6 +178,10 @@ public class Lexer
 		else if(currentChar.matches(regex[4]))
 		{
 			SM.apply(conditions.get(4));
+		}
+		else if(currentChar.matches(regex[6]))
+		{
+			SM.apply(conditions.get(6));
 		}
 		else
 		{
@@ -203,10 +208,12 @@ public class Lexer
 		String WHITE = "[\n\\ \t\b\012]";
 		String QUOTE = "\"";
 		String PAREN = "[()]";
+		String ALL = ".";
+		String SEMI = ";";
 		
-		String [] regex = {ALPHA, DIGIT, WHITE, QUOTE, PAREN};
+		String [] regex = {ALPHA, DIGIT, WHITE, QUOTE, PAREN, ALL, SEMI};
 		
-		StateMachine SM = new StateMachine(states.get(0), transitions);//Initial, transitions;
+		StateMachine SM = new StateMachine("SM", states.get(0), transitions);//Initial, transitions;
 		BufferedReader in = null;
 		in = new BufferedReader(new FileReader(args[0]));
 		String currentLine = null;
@@ -228,22 +235,30 @@ public class Lexer
 				StateMachine peeker = null;
 				
 				if( i + 1 < chars.length)
-				{
-					peeker = new StateMachine(SM.current, transitions);
+				{	
+					
+					peeker = new StateMachine("peeker", SM.current, transitions);
 					peeker = checkCondition(peeker,conditions, regex, SM.current, ""+chars[i+1]);
+					
+					currentToken +=currentChar;
+					tokenType = current.state;
+					
 					if(current != peeker.current)
 					{
-						currentToken +=currentChar;
-						tokenType = current.state;
-						System.out.println("<"+tokenType+" "+currentToken+">");//found token
+						if(current.state == "string")//Special case to stop peeker from leaving string state befor egrabbing the quotation mark	
+						{
+							i++;
+							currentToken +=""+chars[i];
+							tokenType = current.state;
+							SM.current = states.get(0);
+						}
+						
+						if(!currentToken.matches(WHITE))//make sure our token isnt initial state garbage **could change to not print if in initial state
+							System.out.println("<"+tokenType+" "+currentToken+">");//found token
 						currentToken = "";
 						tokenType = "";
 					}
-					else
-					{
-						currentToken +=currentChar;
-						tokenType = current.state;
-					}
+					
 				}
 				else//Last char on line. So that is our token found.
 				{
@@ -253,14 +268,9 @@ public class Lexer
 				}
 			}
 			
-			
+			SM.current = states.get(0); //New line so set our state machine back to it's initial state	
 		} 
-		
-		
-		
-		
-		
-		
+	
 	}
 
 }
