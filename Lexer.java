@@ -3,8 +3,7 @@ import java.io.*;
 
 public class Lexer
 {
-	public static ArrayList initializeVariables()
-	{
+	public static ArrayList initializeVariables(){//Setting up States, Conditions, Transitions and creating the Transition Table
 		/*Variables Setup*/
 		State Initial = new State("initial",true);
 		State Integer = new State("integer",true);
@@ -14,11 +13,11 @@ public class Lexer
 		State Semi = new State("semicolon",true);
 		State Identifier = new State("identifier",true);
 		State Decimal = new State("decimal",true);
-		State Lparen = new state("lparen",true);
+		State Lparen = new State("lparen",true);
 		State Rparen = new State("rparen",true);
 		State Quote = new State("quote",true);
 		State Float = new State("float");
-		State String = new State)"string");
+		State String = new State("string");
 		State PlusPlus = new State("plusplus");
 		State PlusEquals = new State("plusequals");
 		State TimesEquals = new State("timesequals");
@@ -60,7 +59,7 @@ public class Lexer
 		conditions.add(alpha);
 		conditions.add(digit);
 		conditions.add(lparen);
-		conditions.add(rparens);
+		conditions.add(rparen);
 		conditions.add(equals);
 		conditions.add(plus);
 		conditions.add(times);
@@ -104,9 +103,9 @@ public class Lexer
 		toFloatRelated.add(decimal);
 		floatRelated.add(digit);
 	    stringRelated.add(all);
-	    plusplusRelated.add(plusplus);
-	    plusequals.add(plusequals);
-	    timesequals.add(timesequals);
+	    //plusplusRelated.add(plusplus);
+	    //plusequals.add(plusequals);
+	    //timesequals.add(timesequals);
 	    
 		Transition FromInitialtoInitial = new Transition(Initial, initialRelated, Initial);
 		Transition FromInitialtoInteger = new Transition(Initial, integerRelated, Integer);
@@ -156,61 +155,286 @@ public class Lexer
 		Transition FromPlustoPlusPlus = new Transition(Plus, plusRelated, PlusPlus);
 		Transition FromPlustoPlusEquals = new Transition(Plus, equalsRelated, PlusEquals);
 		
+		Transition FromTimestoInitial = new Transition(Times, initialRelated, Initial);
+		Transition FromTimestoInteger = new Transition(Times, integerRelated, Integer);
+		Transition FromTimestoEquals = new Transition(Times, equalsRelated, Equals);
+		Transition FromTimestoPlus = new Transition(Times, plusRelated, Plus);
+		Transition FromTimestoTimes = new Transition(Times, timesRelated, Times);
+		Transition FromTimestoSemi = new Transition(Times, semiRelated, Semi);
+		Transition FromTimestoIdentifier = new Transition(Times, toIdentifierRelated, Identifier);
+		Transition FromTimestoDecimal = new Transition(Times, decimalRelated, Decimal);
+		Transition FromTimestoLparen = new Transition(Times, lparenRelated, Lparen);
+		Transition FromTimestoRparen = new Transition(Times, rparenRelated, Rparen);
+		Transition FromTimestoQuote = new Transition(Times, quoteRelated, Quote);
+		Transition FromTimestoTimesEquals = new Transition(Times, equalsRelated, TimesEquals);
 		
-		
-		Transition FromFloattoInitial = new Transition(Float, initialRelated, Initial);
-		Transition FromFloattoFloat = new Transition(Float, floatRelated, Float);
-		Transition FromFloattoOperand = new Transition(Float, operandRelated, Operand);
-		Transition FromFloattoIdentifier = new Transition(Float, toIdentifierRelated, Identifier);
-		Transition FromFloattoString = new Transition(Float, toStringRelated, String);
-		
-		Transition FromOperandtoInitial = new Transition(Operand, initialRelated, Initial);
-		Transition FromOperandtoInteger = new Transition(Operand, integerRelated, Integer);
-		//Transition FromOperandtoOperand = new Transition(Operand, operandRelated, Operand);
-		Transition FromOperandtoIdentifier = new Transition(Operand, toIdentifierRelated, Identifier);
-		Transition FromOperandtoString = new Transition(Operand, toStringRelated, String);
+		Transition FromSemitoInitial = new Transition(Semi, initialRelated, Initial);
+		Transition FromSemitoInteger = new Transition(Semi, integerRelated, Integer);
+		Transition FromSemitoEquals = new Transition(Semi, equalsRelated, Equals);
+		Transition FromSemitoPlus = new Transition(Semi, plusRelated, Plus);
+		Transition FromSemitoTimes = new Transition(Semi, timesRelated, Times);
+		Transition FromSemitoSemi = new Transition(Semi, semiRelated, Semi);
+		Transition FromSemitoIdentifier = new Transition(Semi, toIdentifierRelated, Identifier);
+		Transition FromSemitoDecimal = new Transition(Semi, decimalRelated, Decimal);
+		Transition FromSemitoLparen = new Transition(Semi, lparenRelated, Lparen);
+		Transition FromSemitoRparen = new Transition(Semi, rparenRelated, Rparen);
+		Transition FromSemitoQuote = new Transition(Semi, quoteRelated, Quote);
 		
 		Transition FromIdentifiertoInitial = new Transition(Identifier, initialRelated, Initial);
-		Transition FromIdentifiertoOperand = new Transition(Identifier, operandRelated, Operand);
+		Transition FromIdentifiertoEquals = new Transition(Identifier, equalsRelated, Equals);
+		Transition FromIdentifiertoPlus = new Transition(Identifier, plusRelated, Plus);
+		Transition FromIdentifiertoTimes = new Transition(Identifier, timesRelated, Times);
+		Transition FromIdentifiertoSemi = new Transition(Identifier, semiRelated, Semi);
 		Transition FromIdentifiertoIdentifier = new Transition(Identifier, identifierRelated, Identifier);
-		Transition FromIdentifiertoString = new Transition(Identifier, toStringRelated, String);
+		Transition FromIdentifiertoDecimal = new Transition(Identifier, decimalRelated, Decimal);
+		Transition FromIdentifiertoLparen = new Transition(Identifier, lparenRelated, Lparen);
+		Transition FromIdentifiertoRparen = new Transition(Identifier, rparenRelated, Rparen);
+		Transition FromIdentifiertoQuote = new Transition(Identifier, quoteRelated, Quote);
 		
-		Transition FromStringtoInitial = new Transition(String, toStringRelated, Initial);
+		Transition FromDecimaltoFloat = new Transition(Decimal, floatRelated, Float);
+		
+		Transition FromLparentoInitial = new Transition(Lparen, initialRelated, Initial);
+		Transition FromLparentoInteger = new Transition(Lparen, integerRelated, Integer);
+		Transition FromLparentoEquals = new Transition(Lparen, equalsRelated, Equals);
+		Transition FromLparentoPlus = new Transition(Lparen, plusRelated, Plus);
+		Transition FromLparentoTimes = new Transition(Lparen, timesRelated, Times);
+		Transition FromLparentoSemi = new Transition(Lparen, semiRelated, Semi);
+		Transition FromLparentoIdentifier = new Transition(Lparen, toIdentifierRelated, Identifier);
+		Transition FromLparentoDecimal = new Transition(Lparen, decimalRelated, Decimal);
+		Transition FromLparentoLparen = new Transition(Lparen, lparenRelated, Lparen);
+		Transition FromLparentoRparen = new Transition(Lparen, rparenRelated, Rparen);
+		Transition FromLparentoQuote = new Transition(Lparen, quoteRelated, Quote);
+		
+		Transition FromRparentoInitial = new Transition(Rparen, initialRelated, Initial);
+		Transition FromRparentoInteger = new Transition(Rparen, integerRelated, Integer);
+		Transition FromRparentoEquals = new Transition(Rparen, equalsRelated, Equals);
+		Transition FromRparentoPlus = new Transition(Rparen, plusRelated, Plus);
+		Transition FromRparentoTimes = new Transition(Rparen, timesRelated, Times);
+		Transition FromRparentoSemi = new Transition(Rparen, semiRelated, Semi);
+		Transition FromRparentoIdentifier = new Transition(Rparen, toIdentifierRelated, Identifier);
+		Transition FromRparentoDecimal = new Transition(Rparen, decimalRelated, Decimal);
+		Transition FromRparentoLparen = new Transition(Rparen, lparenRelated, Lparen);
+		Transition FromRparentoRparen = new Transition(Rparen, rparenRelated, Rparen);
+		Transition FromRparentoQuote = new Transition(Rparen, quoteRelated, Quote);
+		
+		Transition FromQuotetoString = new Transition(Quote, stringRelated, String);
+		
+		Transition FromFloattoInitial = new Transition(Float, initialRelated, Initial);
+		Transition FromFloattoEquals = new Transition(Float, equalsRelated, Equals);
+		Transition FromFloattoPlus = new Transition(Float, plusRelated, Plus);
+		Transition FromFloattoTimes = new Transition(Float, timesRelated, Times);
+		Transition FromFloattoSemi = new Transition(Float, semiRelated, Semi);
+		Transition FromFloattoIdentifier = new Transition(Float, toIdentifierRelated, Identifier);
+		Transition FromFloattoDecimal = new Transition(Float, decimalRelated, Decimal);
+		Transition FromFloattoLparen = new Transition(Float, lparenRelated, Lparen);
+		Transition FromFloattoRparen = new Transition(Float, rparenRelated, Rparen);
+		Transition FromFloattoQuote = new Transition(Float, quoteRelated, Quote);
+		Transition FromFloattoFloat = new Transition(Float, floatRelated, Float);
+		
+		Transition FromStringtoQuote = new Transition(String, quoteRelated, Quote);
 		Transition FromStringtoString = new Transition(String, stringRelated, String);
+		
+		Transition FromPlusPlustoInitial = new Transition(PlusPlus, initialRelated, Initial);
+		Transition FromPlusPlustoInteger = new Transition(PlusPlus, integerRelated, Integer);
+		Transition FromPlusPlustoEquals = new Transition(PlusPlus, equalsRelated, Equals);
+		Transition FromPlusPlustoPlus = new Transition(PlusPlus, plusRelated, Plus);
+		Transition FromPlusPlustoTimes = new Transition(PlusPlus, timesRelated, Times);
+		Transition FromPlusPlustoSemi = new Transition(PlusPlus, semiRelated, Semi);
+		Transition FromPlusPlustoIdentifier = new Transition(PlusPlus, toIdentifierRelated, Identifier);
+		Transition FromPlusPlustoDecimal = new Transition(PlusPlus, decimalRelated, Decimal);
+		Transition FromPlusPlustoLparen = new Transition(PlusPlus, lparenRelated, Lparen);
+		Transition FromPlusPlustoRparen = new Transition(PlusPlus, rparenRelated, Rparen);
+		Transition FromPlusPlustoquote = new Transition(PlusPlus, quoteRelated, Quote);
+		
+		Transition FromPlusEqualstoInitial = new Transition(PlusEquals, initialRelated, Initial);
+		Transition FromPlusEqualstoInteger = new Transition(PlusEquals, integerRelated, Integer);
+		Transition FromPlusEqualstoEquals = new Transition(PlusEquals, equalsRelated, Equals);
+		Transition FromPlusEqualstoPlus = new Transition(PlusEquals, plusRelated, Plus);
+		Transition FromPlusEqualstoTimes = new Transition(PlusEquals, timesRelated, Times);
+		Transition FromPlusEqualstoSemi = new Transition(PlusEquals, semiRelated, Semi);
+		Transition FromPlusEqualstoIdentifier = new Transition(PlusEquals, toIdentifierRelated, Identifier);
+		Transition FromPlusEqualstoDecimal = new Transition(PlusEquals, decimalRelated, Decimal);
+		Transition FromPlusEqualstoLparen = new Transition(PlusEquals, lparenRelated, Lparen);
+		Transition FromPlusEqualstoRparen = new Transition(PlusEquals, rparenRelated, Rparen);
+		Transition FromPlusEqualstoquote = new Transition(PlusEquals, quoteRelated, Quote);
+	
+		Transition FromTimesEqualstoInitial = new Transition(TimesEquals, initialRelated, Initial);
+		Transition FromTimesEqualstoInteger = new Transition(TimesEquals, integerRelated, Integer);
+		Transition FromTimesEqualstoEquals = new Transition(TimesEquals, equalsRelated, Equals);
+		Transition FromTimesEqualstoPlus = new Transition(TimesEquals, plusRelated, Plus);
+		Transition FromTimesEqualstoTimes = new Transition(TimesEquals, timesRelated, Times);
+		Transition FromTimesEqualstoSemi = new Transition(TimesEquals, semiRelated, Semi);
+		Transition FromTimesEqualstoIdentifier = new Transition(TimesEquals, toIdentifierRelated, Identifier);
+		Transition FromTimesEqualstoDecimal = new Transition(TimesEquals, decimalRelated, Decimal);
+		Transition FromTimesEqualstoLparen = new Transition(TimesEquals, lparenRelated, Lparen);
+		Transition FromTimesEqualstoRparen = new Transition(TimesEquals, rparenRelated, Rparen);
+		Transition FromTimesEqualstoquote = new Transition(TimesEquals, quoteRelated, Quote);
+		
 		
 		ArrayList<Transition> transitions = new ArrayList<Transition>();
 		transitions.add(FromInitialtoInitial);
-		transitions.add(FromInitialtoInteger);
-		transitions.add(FromInitialtoOperand);
-		transitions.add(FromInitialtoIdentifier);
-		transitions.add(FromInitialtoString);
+		transitions.add(FromInitialtoInteger); 
+		transitions.add(FromInitialtoEquals);
+		transitions.add(FromInitialtoPlus);  
+		transitions.add(FromInitialtoTimes);
+		transitions.add(FromInitialtoSemi);
+		transitions.add(FromInitialtoIdentifier);  
+		transitions.add(FromInitialtoDecimal);  
+		transitions.add(FromInitialtoLparen);  
+		transitions.add(FromInitialtoRparen);  
+		transitions.add(FromInitialtoQuote);  
 		
 		transitions.add(FromIntegertoInitial);
 		transitions.add(FromIntegertoInteger);
-		transitions.add(FromIntegertoFloat);
-		transitions.add(FromIntegertoOperand);
+		transitions.add(FromIntegertoEquals);
+		transitions.add(FromIntegertoPlus);
+		transitions.add(FromIntegertoTimes);
+		transitions.add(FromIntegertoSemi);
 		transitions.add(FromIntegertoIdentifier);
-		transitions.add(FromIntegertoString);
+		transitions.add(FromIntegertoLparen);
+		transitions.add(FromIntegertoRparen);
+		transitions.add(FromIntegertoQuote);
+		transitions.add(FromIntegertoFloat);
 		
-		transitions.add(FromFloattoInitial);
-		transitions.add(FromFloattoFloat);
-		transitions.add(FromFloattoOperand);
-		transitions.add(FromFloattoIdentifier);
-		transitions.add(FromIntegertoString);
+		transitions.add(FromEqualstoInitial);
+		transitions.add(FromEqualstoInteger);
+		transitions.add(FromEqualstoEquals);
+		transitions.add(FromEqualstoPlus);
+		transitions.add(FromEqualstoTimes);
+		transitions.add(FromEqualstoSemi);
+		transitions.add(FromEqualstoIdentifier);
+		transitions.add(FromEqualstoDecimal);
+		transitions.add(FromEqualstoLparen);
+		transitions.add(FromEqualstoRparen);
+		transitions.add(FromEqualstoQuote);
 		
-		transitions.add(FromOperandtoInitial);
-		transitions.add(FromOperandtoInteger);
-		//transitions.add(FromOperandtoOperand);
-		transitions.add(FromOperandtoIdentifier);
-		transitions.add(FromOperandtoString);
+		transitions.add(FromPlustoInitial);
+		transitions.add(FromPlustoInteger);
+		transitions.add(FromPlustoTimes);
+		transitions.add(FromPlustoSemi);
+		transitions.add(FromPlustoIdentifier);
+		transitions.add(FromPlustoDecimal);
+		transitions.add(FromPlustoLparen);
+		transitions.add(FromPlustoRparen);
+		transitions.add(FromPlustoQuote);
+		transitions.add(FromPlustoPlusPlus);
+		transitions.add(FromPlustoPlusEquals);
+		
+		transitions.add(FromTimestoInitial);
+		transitions.add(FromTimestoInteger);
+		transitions.add(FromTimestoEquals);
+		transitions.add(FromTimestoPlus);
+		transitions.add(FromTimestoTimes);
+		transitions.add(FromTimestoSemi);
+		transitions.add(FromTimestoIdentifier);
+		transitions.add(FromTimestoDecimal);
+		transitions.add(FromTimestoLparen);
+		transitions.add(FromTimestoRparen);
+		transitions.add(FromTimestoQuote);
+		transitions.add(FromTimestoTimesEquals);
+		
+		transitions.add(FromSemitoInitial);
+		transitions.add(FromSemitoInteger);
+		transitions.add(FromSemitoEquals);
+		transitions.add(FromSemitoPlus);
+		transitions.add(FromSemitoTimes);
+		transitions.add(FromSemitoSemi);
+		transitions.add(FromSemitoIdentifier);
+		transitions.add(FromSemitoDecimal);
+		transitions.add(FromSemitoLparen);
+		transitions.add(FromSemitoRparen);
+		transitions.add(FromSemitoQuote);
 		
 		transitions.add(FromIdentifiertoInitial);
-		transitions.add(FromIdentifiertoOperand);
+		transitions.add(FromIdentifiertoEquals);
+		transitions.add(FromIdentifiertoPlus);
+		transitions.add(FromIdentifiertoTimes);
+		transitions.add(FromIdentifiertoSemi);
 		transitions.add(FromIdentifiertoIdentifier);
-		transitions.add(FromIdentifiertoString);
+		transitions.add(FromIdentifiertoDecimal);
+		transitions.add(FromIdentifiertoLparen);
+		transitions.add(FromIdentifiertoRparen);
+		transitions.add(FromIdentifiertoQuote);
 		
-		transitions.add(FromStringtoInitial);
+		transitions.add(FromDecimaltoFloat);
+		
+		transitions.add(FromLparentoInitial);
+		transitions.add(FromLparentoInteger);
+		transitions.add(FromLparentoEquals);
+		transitions.add(FromLparentoPlus);
+		transitions.add(FromLparentoTimes);
+		transitions.add(FromLparentoSemi);
+		transitions.add(FromLparentoIdentifier);
+		transitions.add(FromLparentoDecimal);
+		transitions.add(FromLparentoLparen);
+		transitions.add(FromLparentoRparen);
+		transitions.add(FromLparentoQuote);
+		
+		transitions.add(FromRparentoInitial);
+		transitions.add(FromRparentoInteger);
+		transitions.add(FromRparentoEquals);
+		transitions.add(FromRparentoPlus);
+		transitions.add(FromRparentoTimes);
+		transitions.add(FromRparentoSemi);
+		transitions.add(FromRparentoIdentifier);
+		transitions.add(FromRparentoDecimal);
+		transitions.add(FromRparentoLparen);
+		transitions.add(FromRparentoRparen);
+		transitions.add(FromRparentoQuote);
+		
+		transitions.add(FromQuotetoString);
+		
+		transitions.add(FromFloattoInitial);
+		transitions.add(FromFloattoEquals);
+		transitions.add(FromFloattoPlus);
+		transitions.add(FromFloattoTimes);
+		transitions.add(FromFloattoSemi);
+		transitions.add(FromFloattoIdentifier);
+		transitions.add(FromFloattoDecimal);
+		transitions.add(FromFloattoLparen);
+		transitions.add(FromFloattoRparen);
+		transitions.add(FromFloattoQuote);
+		transitions.add(FromFloattoFloat);
+		
+		transitions.add(FromStringtoQuote);
 		transitions.add(FromStringtoString);
+		
+		transitions.add(FromPlusPlustoInitial);
+		transitions.add(FromPlusPlustoInteger);
+		transitions.add(FromPlusPlustoEquals);
+		transitions.add(FromPlusPlustoPlus);
+		transitions.add(FromPlusPlustoTimes);
+		transitions.add(FromPlusPlustoSemi);
+		transitions.add(FromPlusPlustoIdentifier);
+		transitions.add(FromPlusPlustoDecimal);
+		transitions.add(FromPlusPlustoLparen);
+		transitions.add(FromPlusPlustoRparen);
+		transitions.add(FromPlusPlustoquote);
+
+		transitions.add(FromPlusEqualstoInitial);
+		transitions.add(FromPlusEqualstoInteger);
+		transitions.add(FromPlusEqualstoEquals);
+		transitions.add(FromPlusEqualstoPlus);
+		transitions.add(FromPlusEqualstoTimes);
+		transitions.add(FromPlusEqualstoSemi);
+		transitions.add(FromPlusEqualstoIdentifier);
+		transitions.add(FromPlusEqualstoDecimal);
+		transitions.add(FromPlusEqualstoLparen);
+		transitions.add(FromPlusEqualstoRparen);
+		transitions.add(FromPlusEqualstoquote);
+		
+		transitions.add(FromTimesEqualstoInitial);
+		transitions.add(FromTimesEqualstoInteger);
+		transitions.add(FromTimesEqualstoEquals);
+		transitions.add(FromTimesEqualstoPlus);
+		transitions.add(FromTimesEqualstoTimes);
+		transitions.add(FromTimesEqualstoSemi);
+		transitions.add(FromTimesEqualstoIdentifier);
+		transitions.add(FromTimesEqualstoDecimal);
+		transitions.add(FromTimesEqualstoLparen);
+		transitions.add(FromTimesEqualstoRparen);
+		transitions.add(FromTimesEqualstoquote);
+		
 		/*End Variables*/
 		
 		ArrayList returnArgs = new ArrayList();
@@ -219,7 +443,6 @@ public class Lexer
 		returnArgs.add(transitions);
 		
 		return returnArgs;
-		
 	}
 	
 	
@@ -228,44 +451,33 @@ public class Lexer
 	
 	public static StateMachine checkCondition(StateMachine SM, ArrayList<Condition> conditions, String [] regex, State currentState, String currentChar)
 	{
-		if(currentState.state == "string" && !currentChar.matches(regex[3]))//Special case for when in the string state
-		{	
-			SM.apply(conditions.get(8));
-		}
-		else if(currentChar.matches(regex[3]))//If character is a quotation mark we have entered or left a string
-		{	
-				SM.apply(conditions.get(3));
-		}
-		else if(currentChar.matches(regex[0]))//Could be an identifier or in a string
+		int j = -1;
+		
+		for(int i = 0; i< regex.length; i++)
 		{
-			SM.apply(conditions.get(0));
-		}				
-		else if(currentChar.matches(regex[1]))//could be entering into a integer/ float or in a string
-		{
-			SM.apply(conditions.get(1));
-		}
-		else if(currentChar.matches(regex[2]))//Should return back to initial state unless in string state
-		{
-			SM.apply(conditions.get(2));
+			if(currentChar.matches(regex[i]))
+			{
+				j = i;
+				break;
+			}
 		}
 		
-		else if(currentChar.matches(regex[4]))
+		if(j == -1)
 		{
-			SM.apply(conditions.get(4));
-		}
-		else if(currentChar.matches(regex[6]))
-		{
-			SM.apply(conditions.get(6));
+			System.out.println("Error: unknown symbol "+currentChar);
 		}
 		else
 		{
-			System.out.println("Unrecognized symbol: "+currentChar);
+			SM.apply(conditions.get(j));
 		}
+		
+		//System.out.println(j);
+		//System.out.println(currentChar);
+		//System.out.println(SM.current.state);
 		
 		return SM;
 		
 	}
-
 
 	public static void main(String args[]) throws IOException, FileNotFoundException
 	{
@@ -275,17 +487,20 @@ public class Lexer
 		ArrayList<Condition> conditions = (ArrayList<Condition>)objects.get(1);
 		ArrayList<Transition> transitions = (ArrayList<Transition>)objects.get(2);
 		
-		
-		
+		String WHITE = "[\n\\ \t\b\012]";
 		String ALPHA = "[A-Za-z]";
 		String DIGIT = "[0-9]";
-		String WHITE = "[\n\\ \t\b\012]";
-		String QUOTE = "\"";
-		String PAREN = "[()]";
-		String ALL = ".";
-		String SEMI = ";";
+		String LPAREN = "[(]";
+		String RPAREN = "[)]";
+		String EQUALS = "[=]";
+		String PLUS = "[+]";
+		String TIMES = "[*]";
+		String SEMI = "[;]";
+		String QUOTE = "[\"]";
+		String DECIMAL = ".";
+		String ALL = "[^\"]";
 		
-		String [] regex = {ALPHA, DIGIT, WHITE, QUOTE, PAREN, ALL, SEMI};
+		String [] regex = {WHITE, ALPHA, DIGIT, LPAREN, RPAREN, EQUALS, PLUS, TIMES, SEMI, QUOTE, DECIMAL, ALL};
 		
 		StateMachine SM = new StateMachine("SM", states.get(0), transitions);//Initial, transitions;
 		BufferedReader in = null;
@@ -308,31 +523,33 @@ public class Lexer
 				
 				StateMachine peeker = null;
 				
+				
 				if( i + 1 < chars.length)
 				{	
 					
 					peeker = new StateMachine("peeker", SM.current, transitions);
 					peeker = checkCondition(peeker,conditions, regex, SM.current, ""+chars[i+1]);
 					
+					if(current == null || peeker.current == null)
+					{
+						System.out.println("Error: illegal symbol orientation found");
+						System.out.println(SM.current.state);
+						System.out.println(currentChar);
+						System.out.println(chars[i-1]);
+						break;
+					}
+				
+					
 					currentToken +=currentChar;
 					tokenType = current.state;
 					
-					if(current != peeker.current)
+					//if both our current and peeker are in accepting states but are not the same state as well as don't print anything from the initial state
+					if(peeker.current.accepting && current.state != peeker.current.state && current.state != "initial")
 					{
-						if(current.state == "string")//Special case to stop peeker from leaving string state befor egrabbing the quotation mark	
-						{
-							i++;
-							currentToken +=""+chars[i];
-							tokenType = current.state;
-							SM.current = states.get(0);
-						}
-						
-						if(!currentToken.matches(WHITE))//make sure our token isnt initial state garbage **could change to not print if in initial state
-							System.out.println("<"+tokenType+" "+currentToken+">");//found token
+						System.out.println("<"+tokenType+" "+currentToken+">");//found token
 						currentToken = "";
 						tokenType = "";
 					}
-					
 				}
 				else//Last char on line. So that is our token found.
 				{
@@ -340,9 +557,8 @@ public class Lexer
 					tokenType = current.state;
 					System.out.println("<"+tokenType+" "+currentToken+">");//found token
 				}
+				SM.current = states.get(0); //Bring the state back to initial for a new line
 			}
-			
-			SM.current = states.get(0); //New line so set our state machine back to it's initial state	
 		} 
 	
 	}
