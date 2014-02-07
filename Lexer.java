@@ -105,18 +105,18 @@ public class Lexer
 		toFloatRelated.add(decimal);
 		floatRelated.add(digit);
 	    
-	    stringRelated.add(white);
-	    stringRelated.add(alpha);
-	    stringRelated.add(digit);
-	    stringRelated.add(lparen);
-	    stringRelated.add(rparen);
-	    stringRelated.add(equals);
-	    stringRelated.add(plus);
-	    stringRelated.add(times);
-	    stringRelated.add(semi);
-	    stringRelated.add(quote);
-	    stringRelated.add(decimal);
-	    stringRelated.add(all);
+	        stringRelated.add(white);
+	        stringRelated.add(alpha);
+	        stringRelated.add(digit);
+	        stringRelated.add(lparen);
+	        stringRelated.add(rparen);
+	        stringRelated.add(equals);
+	        stringRelated.add(plus);
+	        stringRelated.add(times);
+	        stringRelated.add(semi);
+	        stringRelated.add(quote);
+	        stringRelated.add(decimal);
+	        stringRelated.add(all);
 	    
 		Transition FromInitialtoInitial = new Transition(Initial, initialRelated, Initial);
 		Transition FromInitialtoInteger = new Transition(Initial, integerRelated, Integer);
