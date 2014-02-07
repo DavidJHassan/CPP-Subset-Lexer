@@ -3,7 +3,8 @@ import java.io.*;
 
 public class Lexer
 {
-	public static ArrayList initializeVariables(){//Setting up States, Conditions, Transitions and creating the Transition Table
+	public static ArrayList initializeVariables()//Setting up States, Conditions, Transitions and creating the Transition Table
+	{
 		/*Variables Setup*/
 		State Initial = new State("initial",true);
 		State Integer = new State("integer",true);
@@ -21,6 +22,7 @@ public class Lexer
 		State PlusPlus = new State("plusplus");
 		State PlusEquals = new State("plusequals");
 		State TimesEquals = new State("timesequals");
+		State ClosingQuote = new State("string");//the state is actually ClosingQuote however we call it a string for ease later on to distinguish if a token is a string or not
 		
 		ArrayList<State> states = new ArrayList<State>();
 		states.add(Initial);
@@ -39,6 +41,7 @@ public class Lexer
 		states.add(PlusPlus);
 		states.add(PlusEquals);
 		states.add(TimesEquals);
+		states.add(ClosingQuote);
 
 		Condition white = new Condition("white");//whitespace characters
 		Condition alpha = new Condition("alpha");//a-zA-Z
@@ -53,7 +56,6 @@ public class Lexer
 		Condition decimal = new Condition("decimal");// .
 		Condition all = new Condition("all");// all are excepted except the / which is handles in StateMachine as special case
 
-		
 		ArrayList<Condition> conditions = new ArrayList<Condition>();
 		conditions.add(white);
 		conditions.add(alpha);
@@ -102,10 +104,19 @@ public class Lexer
 		quoteRelated.add(quote);
 		toFloatRelated.add(decimal);
 		floatRelated.add(digit);
+	    
+	    stringRelated.add(white);
+	    stringRelated.add(alpha);
+	    stringRelated.add(digit);
+	    stringRelated.add(lparen);
+	    stringRelated.add(rparen);
+	    stringRelated.add(equals);
+	    stringRelated.add(plus);
+	    stringRelated.add(times);
+	    stringRelated.add(semi);
+	    stringRelated.add(quote);
+	    stringRelated.add(decimal);
 	    stringRelated.add(all);
-	    //plusplusRelated.add(plusplus);
-	    //plusequals.add(plusequals);
-	    //timesequals.add(timesequals);
 	    
 		Transition FromInitialtoInitial = new Transition(Initial, initialRelated, Initial);
 		Transition FromInitialtoInteger = new Transition(Initial, integerRelated, Integer);
@@ -157,7 +168,6 @@ public class Lexer
 		
 		Transition FromTimestoInitial = new Transition(Times, initialRelated, Initial);
 		Transition FromTimestoInteger = new Transition(Times, integerRelated, Integer);
-		Transition FromTimestoEquals = new Transition(Times, equalsRelated, Equals);
 		Transition FromTimestoPlus = new Transition(Times, plusRelated, Plus);
 		Transition FromTimestoTimes = new Transition(Times, timesRelated, Times);
 		Transition FromTimestoSemi = new Transition(Times, semiRelated, Semi);
@@ -218,6 +228,7 @@ public class Lexer
 		Transition FromRparentoQuote = new Transition(Rparen, quoteRelated, Quote);
 		
 		Transition FromQuotetoString = new Transition(Quote, stringRelated, String);
+		Transition FromQuotetoClosingQuote = new Transition(Quote, quoteRelated, ClosingQuote);
 		
 		Transition FromFloattoInitial = new Transition(Float, initialRelated, Initial);
 		Transition FromFloattoEquals = new Transition(Float, equalsRelated, Equals);
@@ -231,7 +242,7 @@ public class Lexer
 		Transition FromFloattoQuote = new Transition(Float, quoteRelated, Quote);
 		Transition FromFloattoFloat = new Transition(Float, floatRelated, Float);
 		
-		Transition FromStringtoQuote = new Transition(String, quoteRelated, Quote);
+		Transition FromStringtoClosingQuote = new Transition(String, quoteRelated, ClosingQuote);
 		Transition FromStringtoString = new Transition(String, stringRelated, String);
 		
 		Transition FromPlusPlustoInitial = new Transition(PlusPlus, initialRelated, Initial);
@@ -244,7 +255,7 @@ public class Lexer
 		Transition FromPlusPlustoDecimal = new Transition(PlusPlus, decimalRelated, Decimal);
 		Transition FromPlusPlustoLparen = new Transition(PlusPlus, lparenRelated, Lparen);
 		Transition FromPlusPlustoRparen = new Transition(PlusPlus, rparenRelated, Rparen);
-		Transition FromPlusPlustoquote = new Transition(PlusPlus, quoteRelated, Quote);
+		Transition FromPlusPlustoQuote = new Transition(PlusPlus, quoteRelated, Quote);
 		
 		Transition FromPlusEqualstoInitial = new Transition(PlusEquals, initialRelated, Initial);
 		Transition FromPlusEqualstoInteger = new Transition(PlusEquals, integerRelated, Integer);
@@ -256,7 +267,7 @@ public class Lexer
 		Transition FromPlusEqualstoDecimal = new Transition(PlusEquals, decimalRelated, Decimal);
 		Transition FromPlusEqualstoLparen = new Transition(PlusEquals, lparenRelated, Lparen);
 		Transition FromPlusEqualstoRparen = new Transition(PlusEquals, rparenRelated, Rparen);
-		Transition FromPlusEqualstoquote = new Transition(PlusEquals, quoteRelated, Quote);
+		Transition FromPlusEqualstoQuote = new Transition(PlusEquals, quoteRelated, Quote);
 	
 		Transition FromTimesEqualstoInitial = new Transition(TimesEquals, initialRelated, Initial);
 		Transition FromTimesEqualstoInteger = new Transition(TimesEquals, integerRelated, Integer);
@@ -268,7 +279,19 @@ public class Lexer
 		Transition FromTimesEqualstoDecimal = new Transition(TimesEquals, decimalRelated, Decimal);
 		Transition FromTimesEqualstoLparen = new Transition(TimesEquals, lparenRelated, Lparen);
 		Transition FromTimesEqualstoRparen = new Transition(TimesEquals, rparenRelated, Rparen);
-		Transition FromTimesEqualstoquote = new Transition(TimesEquals, quoteRelated, Quote);
+		Transition FromTimesEqualstoQuote = new Transition(TimesEquals, quoteRelated, Quote);
+		
+		Transition FromClosingQuotetoInitial = new Transition(ClosingQuote, initialRelated, Initial);
+		Transition FromClosingQuotetoInteger = new Transition(ClosingQuote, integerRelated, Integer);
+		Transition FromClosingQuotetoEquals = new Transition(ClosingQuote, equalsRelated, Equals);
+		Transition FromClosingQuotetoPlus = new Transition(ClosingQuote, plusRelated, Plus);
+		Transition FromClosingQuotetoTimes = new Transition(ClosingQuote, timesRelated, Times);
+		Transition FromClosingQuotetoSemi = new Transition(ClosingQuote, semiRelated, Semi);
+		Transition FromClosingQuotetoIdentifier = new Transition(ClosingQuote, identifierRelated, Identifier);
+		Transition FromClosingQuotetoDecimal = new Transition(ClosingQuote, decimalRelated, Decimal);
+		Transition FromClosingQuotetoLparen = new Transition(ClosingQuote, lparenRelated, Lparen);
+		Transition FromClosingQuotetoRparen = new Transition(ClosingQuote, rparenRelated, Rparen);
+		Transition FromClosingQuotetoQuote = new Transition(ClosingQuote, quoteRelated, Quote);
 		
 		
 		ArrayList<Transition> transitions = new ArrayList<Transition>();
@@ -322,7 +345,6 @@ public class Lexer
 		
 		transitions.add(FromTimestoInitial);
 		transitions.add(FromTimestoInteger);
-		transitions.add(FromTimestoEquals);
 		transitions.add(FromTimestoPlus);
 		transitions.add(FromTimestoTimes);
 		transitions.add(FromTimestoSemi);
@@ -396,7 +418,7 @@ public class Lexer
 		transitions.add(FromFloattoQuote);
 		transitions.add(FromFloattoFloat);
 		
-		transitions.add(FromStringtoQuote);
+		transitions.add(FromStringtoClosingQuote);
 		transitions.add(FromStringtoString);
 		
 		transitions.add(FromPlusPlustoInitial);
@@ -409,7 +431,7 @@ public class Lexer
 		transitions.add(FromPlusPlustoDecimal);
 		transitions.add(FromPlusPlustoLparen);
 		transitions.add(FromPlusPlustoRparen);
-		transitions.add(FromPlusPlustoquote);
+		transitions.add(FromPlusPlustoQuote);
 
 		transitions.add(FromPlusEqualstoInitial);
 		transitions.add(FromPlusEqualstoInteger);
@@ -421,7 +443,7 @@ public class Lexer
 		transitions.add(FromPlusEqualstoDecimal);
 		transitions.add(FromPlusEqualstoLparen);
 		transitions.add(FromPlusEqualstoRparen);
-		transitions.add(FromPlusEqualstoquote);
+		transitions.add(FromPlusEqualstoQuote);
 		
 		transitions.add(FromTimesEqualstoInitial);
 		transitions.add(FromTimesEqualstoInteger);
@@ -433,7 +455,19 @@ public class Lexer
 		transitions.add(FromTimesEqualstoDecimal);
 		transitions.add(FromTimesEqualstoLparen);
 		transitions.add(FromTimesEqualstoRparen);
-		transitions.add(FromTimesEqualstoquote);
+		transitions.add(FromTimesEqualstoQuote);
+		
+		transitions.add(FromClosingQuotetoInitial);
+		transitions.add(FromClosingQuotetoInteger);
+		transitions.add(FromClosingQuotetoEquals);
+		transitions.add(FromClosingQuotetoPlus);
+		transitions.add(FromClosingQuotetoTimes);
+		transitions.add(FromClosingQuotetoSemi);
+		transitions.add(FromClosingQuotetoIdentifier);
+		transitions.add(FromClosingQuotetoDecimal);
+		transitions.add(FromClosingQuotetoLparen);
+		transitions.add(FromClosingQuotetoRparen);
+		transitions.add(FromClosingQuotetoQuote);
 		
 		/*End Variables*/
 		
@@ -445,48 +479,40 @@ public class Lexer
 		return returnArgs;
 	}
 	
-	
-	
-	
-	
+	/*checks to see what pattern the current character matches and then lets the State Machine determine if such a transition exists. If it does the SM is now in a new state else a dead state */
 	public static StateMachine checkCondition(StateMachine SM, ArrayList<Condition> conditions, String [] regex, State currentState, String currentChar)
 	{
 		int j = -1;
 		
 		for(int i = 0; i< regex.length; i++)
 		{
-			if(currentChar.matches(regex[i]))
+			if(currentChar.matches(regex[i]) || currentChar.equals(regex[i]))
 			{
 				j = i;
 				break;
 			}
 		}
-		
+	
 		if(j == -1)
 		{
-			System.out.println("Error: unknown symbol "+currentChar);
+			SM.current = null;
 		}
 		else
 		{
 			SM.apply(conditions.get(j));
 		}
-		
-		//System.out.println(j);
-		//System.out.println(currentChar);
-		//System.out.println(SM.current.state);
-		
+
 		return SM;
-		
 	}
 
 	public static void main(String args[]) throws IOException, FileNotFoundException
 	{
-		
 		ArrayList objects = initializeVariables();
 		ArrayList<State> states = (ArrayList<State>)objects.get(0);
 		ArrayList<Condition> conditions = (ArrayList<Condition>)objects.get(1);
 		ArrayList<Transition> transitions = (ArrayList<Transition>)objects.get(2);
 		
+		/*BEGIN setup up REGEX patterns*/
 		String WHITE = "[\n\\ \t\b\012]";
 		String ALPHA = "[A-Za-z]";
 		String DIGIT = "[0-9]";
@@ -496,11 +522,12 @@ public class Lexer
 		String PLUS = "[+]";
 		String TIMES = "[*]";
 		String SEMI = "[;]";
-		String QUOTE = "[\"]";
-		String DECIMAL = ".";
+		String QUOTE = "\"";
+		String DECIMAL = "[\\.]";
 		String ALL = "[^\"]";
 		
 		String [] regex = {WHITE, ALPHA, DIGIT, LPAREN, RPAREN, EQUALS, PLUS, TIMES, SEMI, QUOTE, DECIMAL, ALL};
+		/*END setup up REGEX patterns*/
 		
 		StateMachine SM = new StateMachine("SM", states.get(0), transitions);//Initial, transitions;
 		BufferedReader in = null;
@@ -509,6 +536,7 @@ public class Lexer
 		
 		while((currentLine = in.readLine()) != null)
 		{
+			/*BEGING getToken()*/
 			String currentToken ="";
 			String tokenType = "";
 			int tokenLength = 0;		
@@ -519,48 +547,54 @@ public class Lexer
 				String currentChar = ""+chars[i];
 				
 				SM = checkCondition(SM, conditions, regex,  SM.current, currentChar);
+				
+				if(SM.current == null)//found Error Token/char
+				{
+					System.out.println("<Error(1) "+currentChar+" >");
+					currentChar = "";
+					SM.current = states.get(0);
+				}
+				
 				State current = SM.current;
 				
 				StateMachine peeker = null;
 				
-				
 				if( i + 1 < chars.length)
 				{	
-					
+					String peekChar = ""+chars[i+1];
 					peeker = new StateMachine("peeker", SM.current, transitions);
-					peeker = checkCondition(peeker,conditions, regex, SM.current, ""+chars[i+1]);
+					peeker = checkCondition(peeker,conditions, regex, SM.current, peekChar);
 					
-					if(current == null || peeker.current == null)
+					if(peeker.current == null)
 					{
-						System.out.println("Error: illegal symbol orientation found");
-						System.out.println(SM.current.state);
-						System.out.println(currentChar);
-						System.out.println(chars[i-1]);
-						break;
+						peeker.current = states.get(0);
 					}
-				
 					
 					currentToken +=currentChar;
 					tokenType = current.state;
 					
 					//if both our current and peeker are in accepting states but are not the same state as well as don't print anything from the initial state
-					if(peeker.current.accepting && current.state != peeker.current.state && current.state != "initial")
+					if(peeker.current.accepting && (current.state != peeker.current.state) && (current.state != "initial"))
 					{
-						System.out.println("<"+tokenType+" "+currentToken+">");//found token
+						currentToken = currentToken.trim();
+						System.out.println("<"+tokenType+"("+currentToken.length()+") "+currentToken+" >");//found token
 						currentToken = "";
 						tokenType = "";
 					}
 				}
 				else//Last char on line. So that is our token found.
 				{
-					currentToken +=currentChar;
-					tokenType = current.state;
-					System.out.println("<"+tokenType+" "+currentToken+">");//found token
+					if(current.state != "initial")
+					{
+						currentToken +=currentChar;
+						tokenType = current.state;
+						currentToken = currentToken.trim();
+						System.out.println("<"+tokenType+"("+currentToken.length()+") "+currentToken+" >");//found token
+					}
 				}
-				SM.current = states.get(0); //Bring the state back to initial for a new line
 			}
+			SM.current = states.get(0);
+			/*END getToken() */
 		} 
-	
 	}
-
 }
